@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snapshot Diff - File System Analysis</title>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <!-- LINK TO EXTERNAL CSS FILE -->
+    <link rel="stylesheet" href="index.css"> 
+    <!-- Load Lucide icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header>
+        <div class="container nav-content">
+            <a href="#" class="logo-link">
+                <span class="logo-text">SnapshotDiff</span>
+            </a>
+            
+            <!-- Desktop Menu -->
+            <nav class="desktop-nav" style="display: flex; gap: 2rem;">
+                <a href="#features">Features</a>
+                <a href="#usecases">Use Cases</a>
+                <a href="#cta">Pricing</a>
+                <a href="#" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; color: white; border-radius: 6px; background-color: var(--secondary-blue); transition: background-color 0.2s; box-shadow: 0 0 10px rgba(30, 144, 255, 0.6);">Get Started</a>
+            </nav>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="mobile-menu-button">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px; color: var(--text-light);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu (Hidden by Default) -->
+        <div id="mobile-menu" style="display: none; padding: 0.5rem 1rem; background-color: var(--bg-medium);">
+            <a href="#features" class="mobile-menu-item">Features</a>
+            <a href="#usecases" class="mobile-menu-item">Use Cases</a>
+            <a href="#cta" class="mobile-menu-item">Pricing</a>
+            <a href="#" class="mobile-menu-item mobile-menu-cta">Get Started</a>
+        </div>
+    </header>
+    
+    <main>
+        <!-- 1. Hero Section -->
+        <section id="hero">
+            <div class="container hero-content">
+                <h1 class="hero-title">
+                    Instant File System Diff.
+                    <br>
+                    Know Every Change.
+                </h1>
+                <p class="hero-subtitle">
+                    Capture and compare file system snapshots with blazing speed. Identify additions, deletions, and modifications across millions of files, perfect for deployment audits and security analysis.
+                </p>
+                <div class="hero-actions">
+                    <a href="#" class="cta-btn">
+                        Start Diffing Now
+                    </a>
+                    <a href="#features" class="learn-more-btn">
+                        <i data-lucide="info" style="width: 20px; height: 20px; margin-right: 8px;"></i>
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Features Section -->
+        <section class="section-padding" id="features">
+            <div class="container">
+                <div class="text-center" style="margin-bottom: 4rem;">
+                    <h2 class="heading-title">Core <span>Capabilities</span></h2>
+                    <p class="card-text" style="font-size: 1.125rem; max-width: 896px; margin: 1rem auto 0 auto;">Engineered for performance, built for precision. Discover the key features that make Snapshot Diff an essential tool in your development workflow.</p>
+                </div>
+                
+                <div class="features-grid">
+                    
+                    <!-- Feature 1: Blazing Performance -->
+                    <div class="tech-card">
+                        <div class="icon-circle icon-blue">
+                            <i data-lucide="zap" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <h3 class="card-title">Blazing Performance</h3>
+                        <p class="card-text">Utilizes concurrent hashing and optimized indexing to generate diff reports in seconds, even on massive file systems with millions of nodes.</p>
+                    </div>
+
+                    <!-- Feature 2: Deep Analysis -->
+                    <div class="tech-card">
+                        <div class="icon-circle icon-cyan">
+                            <i data-lucide="search-code" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <h3 class="card-title">Deep Content Analysis</h3>
+                        <p class="card-text">Goes beyond simple timestamp checks. Compares files using configurable hash algorithms (SHA-256, MD5) to guarantee content integrity.</p>
+                    </div>
+
+                    <!-- Feature 3: Filter & Visualize -->
+                    <div class="tech-card">
+                        <div class="icon-circle icon-blue">
+                            <i data-lucide="bar-chart-3" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <h3 class="card-title">Filter & Visualize</h3>
+                        <p class="card-text">Powerful filtering by file type, size, and path. Interactive dashboard for visualizing changes with clear, color-coded summaries.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Use Cases Section -->
+        <section class="section-padding" id="usecases">
+            <div class="container">
+                <div class="text-center" style="margin-bottom: 4rem;">
+                    <h2 class="heading-title">Where It <span>Excels</span></h2>
+                    <p class="card-text" style="font-size: 1.125rem; max-width: 896px; margin: 1rem auto 0 auto;">Practical scenarios where knowing the exact difference between two system states is mission-critical.</p>
+                </div>
+                
+                <div class="use-case-grid">
+                    
+                    <!-- Use Case 1: Deployment Verification -->
+                    <div class="use-case-card use-case-card-1">
+                        <div class="uc-header">
+                            <i data-lucide="cloud-cog" style="width: 24px; height: 24px; color: var(--primary-cyan);"></i>
+                            <h4>Deployment Verification</h4>
+                        </div>
+                        <p class="card-text">Confirm that only intended files were deployed and that no residual or unexpected files were left behind in the target environment.</p>
+                    </div>
+
+                    <!-- Use Case 2: Security Audits -->
+                    <div class="use-case-card use-case-card-2">
+                        <div class="uc-header">
+                            <i data-lucide="shield-check" style="width: 24px; height: 24px; color: var(--secondary-blue);"></i>
+                            <h4>Security Audits</h4>
+                        </div>
+                        <p class="card-text">Quickly detect unauthorized file modifications or injections in critical directories by comparing daily or hourly snapshots.</p>
+                    </div>
+
+                    <!-- Use Case 3: Backup Integrity Check -->
+                    <div class="use-case-card use-case-card-3">
+                        <div class="uc-header">
+                            <i data-lucide="save" style="width: 24px; height: 24px; color: var(--primary-cyan);"></i>
+                            <h4>Backup Integrity Check</h4>
+                        </div>
+                        <p class="card-text">Validate the successful restoration of a backup by comparing the restored file tree against the original snapshot prior to failure.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. CTA Section -->
+        <section class="section-padding" id="cta">
+            <div class="container text-center">
+                <div class="cta-content">
+                    <h2 class="cta-title">
+                        Ready to Gain <span>Full Visibility</span>?
+                    </h2>
+                    <p class="cta-subtitle">
+                        Stop guessing what changed. Start knowing. Get started with a free trial and integrate Snapshot Diff into your CI/CD pipeline today.
+                    </p>
+                    <a href="#" class="cta-btn" style="margin: 0.5rem auto;">
+                        Get Started for Free
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <p class="footer-text">
+                &copy; 2024 SnapshotDiff. All rights reserved. | <a href="#">Terms of Service</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- LINK TO EXTERNAL JAVASCRIPT FILE -->
+    <script src="index.js"></script>
+</body>
+</html>
