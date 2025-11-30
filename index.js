@@ -40,3 +40,37 @@ async function callApi(endpoint, method, body) {
         }
     }
 }
+
+// Error message box
+function displayMessage(text, type = 'info') {
+    let msgBox = document.getElementById('temp-message-box');
+    if (!msgBox) {
+        msgBox = document.createElement('div');
+        msgBox.id = 'temp-message-box';
+        msgBox.style.cssText = `
+            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            padding: 15px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            font-family: 'Inter', sans-serif; transition: opacity 0.5s ease-in-out;
+            opacity: 0; max-width: 350px; color: #0D1117; font-weight: 600;
+        `;
+        document.body.appendChild(msgBox);
+    }
+
+    if (type === 'error') {
+        msgBox.style.backgroundColor = '#FF6347'; // Tomato Red
+    } else if (type === 'success') {
+        msgBox.style.backgroundColor = '#3CB371'; // Medium Sea Green
+    } else {
+        msgBox.style.backgroundColor = '#87CEFA'; // Light Sky Blue
+    }
+
+    msgBox.textContent = text;
+    msgBox.style.opacity = 1;
+
+    setTimeout(() => {
+        msgBox.style.opacity = 0;
+        setTimeout(() => msgBox.remove(), 600);
+    }, 4000);
+}
+
+
