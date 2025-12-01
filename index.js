@@ -74,3 +74,43 @@ function displayMessage(text, type = 'info') {
 }
 
 
+//ADDING PAGE RESPONSE (HTML CONTENT)
+
+document.addEventListener('DOMContentLoaded', () => {
+
+
+    // Handle Snapshot Capture Click
+    const captureBtn = document.getElementById('capture-snapshot-btn');
+    if (captureBtn) {
+        captureBtn.addEventListener('click', () => {
+            const path = document.getElementById('file-path').value.trim(); // Get path from input
+            const id = document.getElementById('snapshot-id').value.trim();
+            
+            if (!path) {
+                displayMessage('Please enter the directory path.', 'error');
+                return;
+            }
+            if (!id) {
+                displayMessage('Please enter a Snapshot ID.', 'error');
+                return;
+            }
+            
+            takeSnapshot(path, id);
+        });
+    }
+    
+    // Handle Diff Run Click
+    const diffBtn = document.getElementById('run-diff-btn');
+    if (diffBtn) {
+        diffBtn.addEventListener('click', () => {
+            const idA = document.getElementById('diff-id-a').value.trim();
+            const idB = document.getElementById('diff-id-b').value.trim();
+            
+            if (idA && idB) {
+                runDiff(idA, idB);
+            } else {
+                displayMessage('Please enter both Snapshot A and Snapshot B IDs.', 'error');
+            }
+        });
+    }
+});
