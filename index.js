@@ -73,6 +73,55 @@ function displayMessage(text, type = 'info') {
     }, 4000);
 }
 
+//API calling
+async function takeSnapshot(path, snapshotId) {
+    document.getElementById('snapshot-status').textContent = `Capturing snapshot for path: ${path}...`;
+    
+    const result = await callApi('/snapshot', 'POST', { 
+        path: path, 
+        id: snapshotId 
+    });
+
+    if (result) {
+        displayMessage(`Snapshot ${result.id} created with ${result.file_count} files!`, 'success');
+        document.getElementById('snapshot-status').textContent = `Snapshot ${result.id} is ready. File Count: ${result.file_count}`;
+    } else {
+        document.getElementById('snapshot-status').textContent = `Snapshot failed. Check console for errors.`;
+    }
+}
+
+async function runDiff(idA, idB) {
+    document.getElementById('diff-summary').innerHTML = '<li>Status: <span style="color: var(--primary-cyan);">Comparing...</span></li>';
+
+    const result = await callApi('/diff', 'POST', { 
+        id_a: idA, 
+        id_b: idB 
+    });
+
+    if (result) {
+        displayMessage(`Diff Complete: ${idA} vs ${idB}`, 'success');
+        
+        const summary = result.summary;
+        // The Python backend is designed to return the counts directly.
+
+        const summaryHtml = `
+            <li>Added: <span style="color: #3CB371;">${summary.added || 0}</span> file(s)</li>
+            <li>Deleted: <span style="color: #FF6347;">${summary.deleted || 0}</span> file(s)</li>
+            <li>Modified: <span style="color: #FFA500;">${summary.modified || 0}</span> file(s)</li>
+        `;
+        document.getElementById('diff-summary').innerHTML = summaryHtml;
+
+        // Log detailed changes to console for the user to inspect
+        const details = result.diff_details;
+        console.groupCollapsed(`Diff Details for ${idA} vs ${idB} (Click to expand)`);
+        if (details.added.length > 0) console.log('ADDED:', details.added);
+        if (details.deleted.length > 0) console.log('DELETED:', details.deleted);
+        if (details.modified.length > 0) console.log('MODIFIED:', details.modified);
+        console.groupEnd();
+    } else {
+        document.getElementById('diff-summary').innerHTML = '<li>Status: <span style="color: #FF6347;">**Diff Failed.**</span></li>';
+    }
+}
 
 //ADDING PAGE RESPONSE (HTML CONTENT)
 
@@ -114,3 +163,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
