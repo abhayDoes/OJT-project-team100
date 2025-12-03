@@ -156,4 +156,53 @@ def compare_snapshots(snapshot_a_id, snapshot_b_id):
             "deleted": deleted,
             "modified": modified,
         }
+
+
+#Flask endpoints
+
+        @app.route('/snapshot', methods=['POST'])
+def handle_snapshot():
+    """Endpoint to create a new file system snapshot."""
+    data = request.json
+    path = data.get('path')
+    snapshot_id = data.get('id')
+
+    if not path or not snapshot_id:
+        return jsonify({"error": "Missing 'path' or 'id' in request"}), 400
+
+    try:
+        file_count = create_snapshot(path, snapshot_id)
+        return jsonify({
+            "status": "success",
+            "id": snapshot_id,
+            "file_count": file_count
+        }), 200
+    except (FileNotFoundError, PermissionError, Exception) as e:
+        # Catch all relevant exceptions
+        print(f"Server error during snapshot: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/diff', methods=['POST'])
+def handle_diff():
+    """Endpoint to compare two existing snapshots."""
+    data = request.json
+    id_a = data.get('id_a')
+    id_b = data.get('id_b')
+
+    if not id_a or not id_b:
+        return jsonify({"error": "Missing 'id_a' or 'id_b' in request"}), 400
+    
+    # Check if snapshots exist before attempting comparison
+    if load_snapshot(id_a) is None or load_snapshot(id_b) is None:
+        return jsonify({"error": "One or both snapshot IDs do not exist in the database. Please capture them first."}), 404
+
+    try:
+        diff_result = compare_snapshots(id_a, id_b)
+        return jsonify(diff_result), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        print(f"Server error during diff: {e}")
+        return jsonify({"error": "Internal server error during snapshot comparison."}), 500
+
     
