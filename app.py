@@ -119,3 +119,41 @@ def load_snapshot(snapshot_id):
         return snapshot
     finally:
         conn.close()
+
+
+def compare_snapshots(snapshot_a_id, snapshot_b_id):
+    """Compares two stored snapshots (A vs B) retrieved from the database."""
+    snap_a = load_snapshot(snapshot_a_id)
+    snap_b = load_snapshot(snapshot_b_id)
+
+    if snap_a is None or snap_b is None:
+        raise ValueError("One or both snapshot IDs not found.")
+
+    added = []
+    deleted = []
+    modified = []
+
+    # Iterate over Snapshot B (the newer state)
+    for path_b, hash_b in snap_b.items():
+        if path_b not in snap_a:
+            added.append(path_b)
+        elif snap_a[path_b] != hash_b:
+            modified.append(path_b)
+
+    # Iterate over Snapshot A (the older state) to find deletions
+    for path_a in snap_a.keys():
+        if path_a not in snap_b:
+            deleted.append(path_a)
+
+    return {
+        "summary": {
+            "added": len(added),
+            "deleted": len(deleted),
+            "modified": len(modified),
+        },
+        "diff_details": {
+            "added": added,
+            "deleted": deleted,
+            "modified": modified,
+        }
+    
