@@ -1,6 +1,6 @@
 lucide.createIcons(); //create icons for the website
 
-const API_BASE_URL = 'http://localhost:5002'; //base url for the api
+const API_BASE_URL = window.location.origin; // Automatically uses current domain
 
 async function callApi(endpoint, method, body) {
     const maxRetries = 3;
@@ -163,4 +163,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
 
