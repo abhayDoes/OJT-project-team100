@@ -156,6 +156,7 @@ def compare_snapshots(snapshot_a_id, snapshot_b_id):
             "deleted": deleted,
             "modified": modified,
         }
+    }
 
 
 #Flask endpoints
