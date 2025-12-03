@@ -205,4 +205,35 @@ def handle_diff():
         print(f"Server error during diff: {e}")
         return jsonify({"error": "Internal server error during snapshot comparison."}), 500
 
+
+@app.route('/api/status', methods=['GET'])
+def server_status():
+    """Simple status check for the frontend, showing stored IDs."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.execute("SELECT DISTINCT id FROM snapshots")
+        snapshots = [row[0] for row in cursor.fetchall()]
+        return jsonify({
+            "status": "Server running", 
+            "info": "Snapshot & Diff Backend active with SQLite persistence.",
+            "snapshots_in_db": snapshots,
+        }), 200
+    finally:
+        conn.close()
+
+@app.route('/')
+def serve_index():
+    """Serve the index.html file."""
+    return send_from_directory('.', 'index.html')
+
+@app.route('/<path:filename>')
+def serve_static(filename):
+    """Serve static files (CSS, JS, HTML)."""
+    return send_from_directory('.', filename)
+
+if __name__ == '__main__':
+    initialize_database() # Initialize DB before starting the app
+    print("------------------------------------------------------------------")
+    app.run(port=5503, debug=True, use_reloader=False)
+
     
