@@ -26,3 +26,30 @@ def calculate_file_hash(filepath, block_size=65536):
         # Catch PermissionError, read errors, etc.
         print(f"Error reading file {filepath}: {e}")
         return None
+# --- Database Configuration ---
+DATABASE_NAME = 'snapshots.db'
+
+def get_db_connection():
+    """Establishes a connection to the SQLite database."""
+    conn = sqlite3.connect(DATABASE_NAME)
+    conn.row_factory = sqlite3.Row  # Allows accessing columns by name
+    return conn
+
+def initialize_database():
+    """Creates the necessary table if it doesn't exist."""
+    print(f"Initializing database: {DATABASE_NAME}...")
+    conn = get_db_connection()
+    try:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS snapshots (
+                id TEXT NOT NULL,
+                filepath TEXT NOT NULL,
+                hash TEXT NOT NULL,
+                PRIMARY KEY (id, filepath)
+            );
+        """)
+        conn.commit()
+    except Exception as e:
+        print(f"Error during database initialization: {e}")
+    finally:
+        conn.close()
