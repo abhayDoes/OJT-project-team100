@@ -10,7 +10,7 @@ CORS(app)
 
 
 # --- Database Configuration ---
-DATABASE_NAME = 'snapshots.db'
+DATABASE_NAME = os.getenv('DATABASE_NAME', 'snapshots.db')
 
 def get_db_connection():
     """Establishes a connection to the SQLite database."""
@@ -232,8 +232,11 @@ def serve_static(filename):
     return send_from_directory('.', filename)
 
 if __name__ == '__main__':
-    initialize_database() # Initialize DB before starting the app
+    initialize_database()
     print("------------------------------------------------------------------")
-    app.run(port=5503, debug=True, use_reloader=False)
+    # Render provides PORT as environment variable
+    port = int(os.getenv('PORT', 5503))
+    debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(host='0.0.0.0', port=port, debug=debug, use_reloader=False)
 
     
