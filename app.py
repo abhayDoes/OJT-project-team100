@@ -130,85 +130,20 @@ def diff():
         }
     }), 200
 
-#Flask endpoints
 
-@app.route('/snapshot', methods=['POST'])
-def handle_snapshot():
-    """Endpoint to create a new file system snapshot."""
-    data = request.json
-    path = data.get('path')
-    snapshot_id = data.get('id')
+# STATIC
 
-    if not path or not snapshot_id:
-        return jsonify({"error": "Missing 'path' or 'id' in request"}), 400
+@app.route("/")
+def root():
+    return send_from_directory(".", "index.html")
 
-    try:
-        file_count = create_snapshot(path, snapshot_id)
-        return jsonify({
-            "status": "success",
-            "id": snapshot_id,
-            "file_count": file_count
-        }), 200
-    except (FileNotFoundError, PermissionError, Exception) as e:
-        # Catch all relevant exceptions
-        print(f"Server error during snapshot: {e}")
-        return jsonify({"error": str(e)}), 500
+@app.route("/<path:path>")
+def static_proxy(path):
+    return send_from_directory(".", path)
 
-@app.route('/diff', methods=['POST'])
-def handle_diff():
-    """Endpoint to compare two existing snapshots."""
-    data = request.json
-    id_a = data.get('id_a')
-    id_b = data.get('id_b')
+# START
 
-    if not id_a or not id_b:
-        return jsonify({"error": "Missing 'id_a' or 'id_b' in request"}), 400
-    
-    # Check if snapshots exist before attempting comparison
-    if load_snapshot(id_a) is None or load_snapshot(id_b) is None:
-        return jsonify({"error": "One or both snapshot IDs do not exist in the database. Please capture them first."}), 404
+if __name__ == "__main__":
+    init_db()
+    app.run(port=5503, debug=True)
 
-    try:
-        diff_result = compare_snapshots(id_a, id_b)
-        return jsonify(diff_result), 200
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 404
-    except Exception as e:
-        print(f"Server error during diff: {e}")
-        return jsonify({"error": "Internal server error during snapshot comparison."}), 500
-
-
-@app.route('/api/status', methods=['GET'])
-def server_status():
-    """Simple status check for the frontend, showing stored IDs."""
-    conn = get_db_connection()
-    try:
-        cursor = conn.execute("SELECT DISTINCT id FROM snapshots")
-        snapshots = [row[0] for row in cursor.fetchall()]
-        return jsonify({
-            "status": "Server running", 
-            "info": "Snapshot & Diff Backend active with SQLite persistence.",
-            "snapshots_in_db": snapshots,
-        }), 200
-    finally:
-        conn.close()
-
-@app.route('/')
-def serve_index():
-    """Serve the index.html file."""
-    return send_from_directory('.', 'index.html')
-
-@app.route('/<path:filename>')
-def serve_static(filename):
-    """Serve static files (CSS, JS, HTML)."""
-    return send_from_directory('.', filename)
-
-if __name__ == '__main__':
-    initialize_database()
-    print("------------------------------------------------------------------")
-    # Render provides PORT as environment variable
-    port = int(os.getenv('PORT', 5503))
-    debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
-    app.run(host='0.0.0.0', port=port, debug=debug, use_reloader=False)
-
-    
