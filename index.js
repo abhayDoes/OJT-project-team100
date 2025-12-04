@@ -40,3 +40,32 @@ document.getElementById("upload-snapshot-btn").onclick = async () => {
         `Snapshot created with ${out.file_count} files`;
     notify("Snapshot created!");
 };
+
+
+// ---------------- DIFF ---------------- //
+
+document.getElementById("run-diff-btn").onclick = async () => {
+    const A = document.getElementById("diff-id-a").value.trim();
+    const B = document.getElementById("diff-id-b").value.trim();
+
+    if (!A || !B) return notify("Enter both snapshot IDs.");
+
+    const res = await fetch(`${API}/diff`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ id_a: A, id_b: B })
+    });
+
+    const out = await res.json().catch(() => ({}));
+
+    if (!res.ok) return notify(out.error || "Diff failed");
+
+    const list = document.getElementById("diff-summary");
+    list.innerHTML = `
+        <li>Added: ${out.summary.added}</li>
+        <li>Deleted: ${out.summary.deleted}</li>
+        <li>Modified: ${out.summary.modified}</li>
+    `;
+
+    notify("Diff completed!");
+};
