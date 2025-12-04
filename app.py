@@ -4,38 +4,34 @@ import json
 import sqlite3
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+import tempfile
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
 
-
+DB_NAME = "snapshots.db"
 # --- Database Configuration ---
-DATABASE_NAME = os.getenv('DATABASE_NAME', 'snapshots.db')
-
-def get_db_connection():
-    """Establishes a connection to the SQLite database."""
-    conn = sqlite3.connect(DATABASE_NAME)
-    conn.row_factory = sqlite3.Row  # Allows accessing columns by name
+def get_db():
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
     return conn
 
-def initialize_database():
-    """Creates the necessary table if it doesn't exist."""
-    print(f"Initializing database: {DATABASE_NAME}...")
-    conn = get_db_connection()
-    try:
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS snapshots (
-                id TEXT NOT NULL,
-                filepath TEXT NOT NULL,
-                hash TEXT NOT NULL,
-                PRIMARY KEY (id, filepath)
-            );
-        """)
-        conn.commit()
-    except Exception as e:
-        print(f"Error during database initialization: {e}")
-    finally:
-        conn.close()
+def init_db():
+    conn = get_db()
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS snapshots (
+            id TEXT NOT NULL,
+            filepath TEXT NOT NULL,
+            hash TEXT NOT NULL,
+            PRIMARY KEY (id, filepath)
+        );
+    """)
+    conn.commit()
+    conn.close()
+
+
+
+
 
 # --- Core Logic Functions ---
 
@@ -55,7 +51,7 @@ def calculate_file_hash(filepath, block_size=65536):
     except Exception as e:
         # Catch PermissionError, read errors, etc.
         print(f"Error reading file {filepath}: {e}")
-        return None
+        return Nonxe
 
 
 def create_snapshot(directory_path, snapshot_id):
