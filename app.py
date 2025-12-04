@@ -41,53 +41,31 @@ def hash_file(path):
             h.update(chunk)
     return h.hexdigest()
 
+#snapshot engine
 
 
-def create_snapshot(directory_path, snapshot_id):
-    """
-    Traverses a directory, calculates file hashes, and saves them to the SQLite database.
-    """
-    file_contents = {}
-    file_count = 0
-    full_path = os.path.abspath(directory_path)
-            
-    if not os.path.isdir(full_path):
-        raise FileNotFoundError(f"Directory not found: {full_path}")
+def build_snapshot(dir_root, snapshot_id):
+    conn = get_db()
+    conn.execute("DELETE FROM snapshots WHERE id = ?", (snapshot_id,))
+    conn.commit()
 
-    # Traverse the directory and calculate hashes
-    for root, _, files in os.walk(full_path):
-        for file in files:
-            file_path = os.path.join(root, file)
-            relative_path = os.path.relpath(file_path, full_path)
-            file_hash = calculate_file_hash(file_path)
-            
-            if file_hash:
-                file_contents[relative_path] = file_hash
-                file_count += 1
-    
-    conn = get_db_connection()
-    try:
-        # 1. Delete previous snapshot entries with this ID
-        conn.execute("DELETE FROM snapshots WHERE id = ?", (snapshot_id,))
-        conn.commit()
-        
-        # 2. Insert new snapshot entries
-        snapshot_data = [
-            (snapshot_id, path, file_contents[path])
-            for path in file_contents
-        ]
-        conn.executemany(
-            "INSERT INTO snapshots (id, filepath, hash) VALUES (?, ?, ?)",
-            snapshot_data
-        )
-        conn.commit()
-    except Exception as e:
-        conn.rollback()
-        raise Exception(f"Database write error: {e}")
-    finally:
-        conn.close()
+    count = 0
 
-    return file_count
+    for root, _, files in os.walk(dir_root):
+        for filename in files:
+            full = os.path.join(root, filename)
+            rel = os.path.relpath(full, dir_root)
+            file_hash = hash_file(full)
+
+            conn.execute(
+                "INSERT INTO snapshots(id, filepath, hash) VALUES (?, ?, ?)",
+                (snapshot_id, rel, file_hash)
+            )
+            count += 1
+
+    conn.commit()
+    conn.close()
+    return count
 
 def load_snapshot(snapshot_id):
     """Loads a snapshot from the SQLite database into a dictionary."""
