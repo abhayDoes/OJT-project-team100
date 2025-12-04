@@ -91,61 +91,44 @@ def upload_folder():
         count = build_snapshot(tmp, snapshot_id)
 
     return jsonify({"status": "success", "id": snapshot_id, "file_count": count}), 200
+#diff engine
+@app.route("/diff", methods=["POST"])
+def diff():
+    data = request.json
+    A = data.get("id_a")
+    B = data.get("id_b")
 
-def load_snapshot(snapshot_id):
-    """Loads a snapshot from the SQLite database into a dictionary."""
-    conn = get_db_connection()
-    snapshot = {}
-    try:
-        cursor = conn.execute("SELECT filepath, hash FROM snapshots WHERE id = ?", (snapshot_id,))
-        rows = cursor.fetchall()
-        if not rows:
-            return None # Snapshot ID not found
-            
-        for row in rows:
-            snapshot[row['filepath']] = row['hash']
-        return snapshot
-    finally:
-        conn.close()
+    conn = get_db()
 
+    def load(id):
+        rows = conn.execute(
+            "SELECT filepath, hash FROM snapshots WHERE id = ?",
+            (id,)
+        ).fetchall()
+        return {r["filepath"]: r["hash"] for r in rows} if rows else None
 
-def compare_snapshots(snapshot_a_id, snapshot_b_id):
-    """Compares two stored snapshots (A vs B) retrieved from the database."""
-    snap_a = load_snapshot(snapshot_a_id)
-    snap_b = load_snapshot(snapshot_b_id)
+    snapA = load(A)
+    snapB = load(B)
 
-    if snap_a is None or snap_b is None:
-        raise ValueError("One or both snapshot IDs not found.")
+    if snapA is None or snapB is None:
+        return jsonify({"error": "Snapshot ID not found"}), 404
 
-    added = []
-    deleted = []
-    modified = []
+    added = [p for p in snapB if p not in snapA]
+    deleted = [p for p in snapA if p not in snapB]
+    modified = [p for p in snapB if p in snapA and snapB[p] != snapA[p]]
 
-    # Iterate over Snapshot B (the newer state)
-    for path_b, hash_b in snap_b.items():
-        if path_b not in snap_a:
-            added.append(path_b)
-        elif snap_a[path_b] != hash_b:
-            modified.append(path_b)
-
-    # Iterate over Snapshot A (the older state) to find deletions
-    for path_a in snap_a.keys():
-        if path_a not in snap_b:
-            deleted.append(path_a)
-
-    return {
+    return jsonify({
         "summary": {
             "added": len(added),
             "deleted": len(deleted),
-            "modified": len(modified),
+            "modified": len(modified)
         },
         "diff_details": {
             "added": added,
             "deleted": deleted,
-            "modified": modified,
+            "modified": modified
         }
-    }
-
+    }), 200
 
 #Flask endpoints
 
