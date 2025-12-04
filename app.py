@@ -161,7 +161,7 @@ def compare_snapshots(snapshot_a_id, snapshot_b_id):
 
 #Flask endpoints
 
-        @app.route('/snapshot', methods=['POST'])
+@app.route('/snapshot', methods=['POST'])
 def handle_snapshot():
     """Endpoint to create a new file system snapshot."""
     data = request.json
