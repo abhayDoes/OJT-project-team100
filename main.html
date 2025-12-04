@@ -1,78 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File System Snapshot & Diff</title>
+    <title>Snapshot & Diff</title>
     <link rel="stylesheet" href="index.css">
     <script src="https://unpkg.com/lucide@latest"></script>
-
 </head>
+
 <body>
-            <!-- NEW SECTION: Application Interface -->
-<section class="section-padding" id="app-interface" style="background-color: var(--bg-dark); border-top: 1px solid rgba(0, 255, 255, 0.1);">
+
+<section class="section-padding" style="background-color: var(--bg-dark);">
     <div class="container">
-        <div class="text-center" style="margin-bottom: 3rem;">
-            <h2 class="heading-title">Run <span style="color: var(--secondary-blue);">Snapshot</span> & <span style="color: var(--primary-cyan);">Diff</span></h2>
-            <p class="card-text" style="font-size: 1.125rem; max-width: 800px; margin: 1rem auto 0 auto;">Control your file system analysis directly from the browser. **Remember to run the Python server first!**</p>
-        </div>
 
-        <!-- Snapshot Capture Form -->
-        <div class="use-case-card use-case-card-2" style="margin-bottom: 2rem;">
-            <div class="uc-header">
-                <i data-lucide="camera" style="width: 24px; height: 24px; color: var(--secondary-blue);"></i>
-                <h4>Capture Snapshot</h4>
-            </div>
-            <p class="card-text" style="margin-bottom: 1rem;">Enter the directory path and a unique ID to capture the current state.</p>
-            
-            <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem;">
-                <!-- SEPARATE PLACE FOR DIRECTORY PATH -->
-                <div>
-                    <label for="file-path" class="card-text" style="display: block; margin-bottom: 0.25rem; font-weight: 500; color: var(--text-light);">1. Directory Path (Unrestricted):</label>
-                    <input type="text" id="file-path" placeholder="e.g., C:\Users\Me\MyCode or /home/user/project" 
-                           style="width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid var(--secondary-blue); background-color: var(--bg-dark); color: var(--text-light);" 
-                           value="test_dir">
-                </div>
-                
-                <!-- SEPARATE PLACE FOR SNAPSHOT ID -->
-                <div>
-                    <label for="snapshot-id" class="card-text" style="display: block; margin-bottom: 0.25rem; font-weight: 500; color: var(--text-light);">2. Snapshot ID:</label>
-                    <input type="text" id="snapshot-id" placeholder="e.g., S1, V2.0" 
-                           style="width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid var(--secondary-blue); background-color: var(--bg-dark); color: var(--text-light);" value="S1">
-                </div>
-            </div>
-            
-            <button id="capture-snapshot-btn" class="cta-btn" style="padding: 0.75rem 1.5rem; margin: 0; min-width: 100%; font-weight: 500;">
-                Capture State
+        <h2 class="heading-title text-center" style="margin-bottom: 2rem;">
+            Upload Folder Snapshot
+        </h2>
+
+        <!-- SNAPSHOT -->
+        <div class="use-case-card use-case-card-2">
+
+            <label class="card-text">Select Folder</label>
+            <input type="file" id="folder-upload"
+                webkitdirectory directory multiple
+                style="padding: 0.75rem; border-radius: 6px; width: 100%;">
+
+            <label class="card-text" style="margin-top: 1rem;">Snapshot ID</label>
+            <input type="text" id="snapshot-id"
+                placeholder="e.g., S1"
+                style="padding: 0.75rem; width: 100%; border-radius: 6px;">
+
+            <button id="upload-snapshot-btn" class="cta-btn" style="margin-top: 1rem;">
+                Create Snapshot
             </button>
-            <p id="snapshot-status" class="card-text" style="margin-top: 0.5rem; color: var(--primary-cyan); font-weight: 600;"></p>
+
+            <p id="snapshot-status" class="card-text" style="margin-top: 0.5rem;"></p>
         </div>
 
-        <!-- Diff Comparison Form -->
-        <div class="use-case-card use-case-card-1">
-            <div class="uc-header">
-                <i data-lucide="git-branch" style="width: 24px; height: 24px; color: var(--primary-cyan);"></i>
-                <h4>Compare Snapshots (Diff)</h4>
-            </div>
-            <p class="card-text" style="margin-bottom: 1rem;">Enter the IDs of the two snapshots you want to compare.</p>
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <input type="text" id="diff-id-a" placeholder="Snapshot A ID (e.g., S1)" style="flex-grow: 1; padding: 0.75rem; border-radius: 6px; border: 1px solid var(--primary-cyan); background-color: var(--bg-dark); color: var(--text-light);" value="S1">
-                <input type="text" id="diff-id-b" placeholder="Snapshot B ID (e.g., S2)" style="flex-grow: 1; padding: 0.75rem; border-radius: 6px; border: 1px solid var(--primary-cyan); background-color: var(--bg-dark); color: var(--text-light);" value="S2">
-                <button id="run-diff-btn" class="cta-btn" style="padding: 0.75rem 1.5rem; margin: 0; min-width: 150px; font-weight: 500;">
-                    Run Diff
-                </button>
-            </div>
-            <div id="diff-output" style="margin-top: 1rem; padding: 1rem; background-color: var(--bg-medium); border-radius: 6px;">
-                <p style="font-weight: 600; color: var(--text-light);">Diff Results:</p>
-                <ul id="diff-summary" style="list-style-type: none; padding-left: 0; margin-top: 0.5rem; font-size: 0.9rem;">
-                    <li>Status: Waiting for diff...</li>
-                </ul>
-            </div>
+        <!-- DIFF -->
+        <div class="use-case-card use-case-card-1" style="margin-top: 2rem;">
+
+            <label class="card-text">Snapshot A</label>
+            <input type="text" id="diff-id-a" style="padding: 0.75rem; width: 100%; border-radius: 6px;">
+
+            <label class="card-text" style="margin-top: 1rem;">Snapshot B</label>
+            <input type="text" id="diff-id-b" style="padding: 0.75rem; width: 100%; border-radius: 6px;">
+
+            <button id="run-diff-btn" class="cta-btn" style="margin-top: 1rem;">
+                Run Diff
+            </button>
+
+            <ul id="diff-summary" style="margin-top: 1rem;"></ul>
         </div>
+
     </div>
-    <script src="index.js" defer></script>
-    <script>
-        lucide.createIcons();
-    </script>
+</section>
+
+<script src="index.js" defer></script>
+<script>lucide.createIcons();</script>
+
 </body>
 </html>
