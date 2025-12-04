@@ -67,6 +67,31 @@ def build_snapshot(dir_root, snapshot_id):
     conn.close()
     return count
 
+#Folder upload route
+@app.route("/snapshot/upload-folder", methods=["POST"])
+def upload_folder():
+    snapshot_id = request.form.get("id")
+    files = request.files.getlist("files[]")
+
+    if not snapshot_id:
+        return jsonify({"error": "Snapshot ID missing"}), 400
+
+    if not files:
+        return jsonify({"error": "No files were uploaded"}), 400
+
+    with tempfile.TemporaryDirectory() as tmp:
+        # Rebuild folder structure
+        for file in files:
+            rel = file.filename  # webkitRelativePath
+            dest = os.path.join(tmp, rel)
+
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            file.save(dest)
+
+        count = build_snapshot(tmp, snapshot_id)
+
+    return jsonify({"status": "success", "id": snapshot_id, "file_count": count}), 200
+
 def load_snapshot(snapshot_id):
     """Loads a snapshot from the SQLite database into a dictionary."""
     conn = get_db_connection()
